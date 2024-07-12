@@ -1,3 +1,6 @@
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
 import numpy as np
 
 
@@ -57,3 +60,47 @@ def volume_cal(mask_image, space):
     
     return volume
 
+
+def calculate_dice(pred, target, C): 
+    target = target.long()
+    pred = pred.long()
+    
+    N = pred.shape[0]
+    target_mask = target.data.new(N, C).fill_(0)   
+    target_mask.scatter_(1, target, 1.)    
+    
+    pred_mask = pred.data.new(N, C).fill_(0)
+    pred_mask.scatter_(1, pred, 1.) 
+
+    intersection= pred_mask * target_mask
+    summ = pred_mask + target_mask
+
+    intersection = intersection.sum(0).type(torch.float32)
+    summ = summ.sum(0).type(torch.float32)
+    
+    summ += 1e-5 
+    dice = 2 * intersection / summ
+
+    return dice, intersection, summ    
+
+def calculate_iou(pred, target, C): 
+    target = target.long()
+    pred = pred.long()
+    
+    N = pred.shape[0]
+    target_mask = target.data.new(N, C).fill_(0)
+    target_mask.scatter_(1, target, 1.) 
+
+    pred_mask = pred.data.new(N, C).fill_(0)
+    pred_mask.scatter_(1, pred, 1.) 
+
+    intersection= pred_mask * target_mask
+    summ = pred_mask + target_mask
+
+    intersection = intersection.sum(0).type(torch.float32)
+    summ = summ.sum(0).type(torch.float32)
+    
+    summ += 1e-5 
+    iou = intersection / (summ - intersection)
+    
+    return iou, intersection, summ
