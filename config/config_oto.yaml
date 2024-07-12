@@ -5,12 +5,13 @@ data_root: 'DATA ROOT PATH'
 dataset: 'OTO'
 mrc_src_path: 'magnetic resonan cisternography (MRC) DATA PATH '
 mi2_src_path: 'HYDROPS-Mi2 DATA PATH'
-expresult_path: 'RESULT PATH'
+expresult_path: './exp' #'RESULT PATH'
 
-checkpoint_path: 'CHECKPOINT PATH'
-log_path: 'LOG PATH'
+checkpoint_path: './exp/checkpoint' #'CHECKPOINT PATH'
+log_path: ./log' #'LOG PATH'
 classes: 2
 modality: MRI
+len_dataset: 50000 
 
 # model
 architecture: 3DU-Net
@@ -22,16 +23,19 @@ block: SingleConv
 norm: in
 
 # train
-start_epoch: 1
+start_epoch: 0
 num_epochs: 100
+val_freq: 50
+iter_per_epoch: 200
 batch_size: 4
 training_size: [24, 64, 64] 
-num_workers: batch_size * 4 
+num_workers: 4 
 aug_device: 'cpu'
 random_seed: 2024
+split_seed: 0
 k_fold: 5 
 optimizer: adamw
-base_lr: 1e-3
+base_lr: 0.001
 betas: [0.9, 0.999]
 weight_decay: 0.05  
 weight: [0.5, 1, 1, 1] 
@@ -42,7 +46,7 @@ gaussian_noise_std: 0.02
 additive_brightness_std: 0.7 
 gamma_range: [0.5, 1.6]
 print_freq: 5
-iter_per_epoch: 200
+torch_compile: False
 
 # validation 
 val_freq: 10 
